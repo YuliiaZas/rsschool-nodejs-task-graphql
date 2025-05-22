@@ -3,15 +3,12 @@ import { createGqlResponseSchema, gqlResponseSchema } from './schemas.js';
 import {
   ExecutionResult,
   graphql,
-  GraphQLList,
-  GraphQLObjectType,
   GraphQLSchema,
   parse,
   validate,
 } from 'graphql';
 import depthLimit from 'graphql-depth-limit';
-import { UserType } from './types/user.js';
-import { PrismaClient } from '@prisma/client';
+import { rootQuery } from './rootQuery.js';
 
 const plugin: FastifyPluginAsyncTypebox = async (fastify) => {
   const { prisma } = fastify;
@@ -25,21 +22,16 @@ const plugin: FastifyPluginAsyncTypebox = async (fastify) => {
         200: gqlResponseSchema,
       },
     },
-    async handler(req): Promise<ExecutionResult> {
+    async handler(req, reply): Promise<ExecutionResult> {
       const { query, variables } = req.body;
-      console.log('------', query, variables);
+      console.log('---query---', query);
+      console.log('---variables---', variables);
 
       const validationErrors = validate(schema, parse(query), [depthLimit(5)]);
       if (validationErrors.length > 0) {
-        console.log('validationErrors: ', validationErrors.map((error) => ({
-            message: error.message,
-            locations: error.locations,
-          })));
-        return {
-          errors: validationErrors
-        };
+        return reply.status(400).send({ errors: validationErrors });
       }
-      console.log("validationErrors: ", validationErrors, parse(query));
+      console.log("validationErrors: ", validationErrors);
 
       return await graphql({
         schema,
@@ -52,20 +44,9 @@ const plugin: FastifyPluginAsyncTypebox = async (fastify) => {
 };
 
 const schema = new GraphQLSchema({
-  query: new GraphQLObjectType({
-    name: 'Query',
-    fields: {
-      users: {
-        type: new GraphQLList(UserType),
-        resolve: async (_root, _args, { prisma }: { prisma: PrismaClient }) => {
-          return await prisma.user.findMany();
-        },
-      }
-    },
-  }),
+  query: rootQuery,
   mutation: undefined,
   subscription: undefined,
 });
-
 
 export default plugin;
