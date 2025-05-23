@@ -8,8 +8,9 @@ import {
   validate,
 } from 'graphql';
 import depthLimit from 'graphql-depth-limit';
-import { rootQuery } from './rootQuery.js';
 import { ContextValue } from './types/contextValue.js';
+import { rootMutation } from './rootMutation.js';
+import { rootQuery } from './rootQuery.js';
 
 const plugin: FastifyPluginAsyncTypebox = async (fastify) => {
   const { prisma } = fastify;
@@ -46,8 +47,7 @@ const plugin: FastifyPluginAsyncTypebox = async (fastify) => {
 
 const schema = new GraphQLSchema({
   query: rootQuery,
-  mutation: undefined,
-  subscription: undefined,
+  mutation: rootMutation,
 });
 
 export default plugin;

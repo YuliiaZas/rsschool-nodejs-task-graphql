@@ -1,5 +1,6 @@
 import {
   GraphQLFloat,
+  GraphQLInputObjectType,
   GraphQLList,
   GraphQLNonNull,
   GraphQLObjectType,
@@ -47,5 +48,28 @@ export const UserType = new GraphQLObjectType<User, ContextValue>({
         return subscribers.map((subscriber) => subscriber.subscriber);
       },
     },
+  }),
+});
+
+export type CreateUserDto = {
+  name: string,
+  balance: number,
+}
+
+export type ChangeUserDto = Partial<CreateUserDto>;
+
+export const CreateUserInputType = new GraphQLInputObjectType({
+  name: 'CreateUserInput',
+  fields: () => ({
+    name: { type: new GraphQLNonNull(GraphQLString) },
+    balance: { type: new GraphQLNonNull(GraphQLFloat) },
+  }),
+});
+
+export const ChangeUserInputType = new GraphQLInputObjectType({
+  name: 'ChangeUserInput',
+  fields: () => ({
+    name: { type: GraphQLString },
+    balance: { type: GraphQLFloat },
   }),
 });

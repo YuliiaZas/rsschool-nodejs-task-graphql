@@ -1,4 +1,5 @@
 import {
+  GraphQLInputObjectType,
   GraphQLNonNull,
   GraphQLObjectType,
   GraphQLString,
@@ -20,5 +21,31 @@ export const PostType = new GraphQLObjectType<Post, ContextValue>({
       resolve: async (post, _args, { prisma }) =>
         await prisma.user.findUnique({ where: { id: post.authorId } }),
     }
+  }),
+});
+
+export type ChangePostDto = {
+  title?: string,
+  content?: string,
+}
+
+export type CreatePostDto = Required<ChangePostDto> & {
+  authorId: string,
+};
+
+export const CreatePostInputType = new GraphQLInputObjectType({
+  name: 'CreatePostInput',
+  fields: () => ({
+    authorId: { type: new GraphQLNonNull(UUIDType) },
+    title: { type: new GraphQLNonNull(GraphQLString) },
+    content: { type: new GraphQLNonNull(GraphQLString) },
+  }),
+});
+
+export const ChangePostInputType = new GraphQLInputObjectType({
+  name: 'ChangePostInput',
+  fields: () => ({
+    title: { type: GraphQLString },
+    content: { type: GraphQLString },
   }),
 });
