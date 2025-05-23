@@ -9,6 +9,7 @@ import {
 } from 'graphql';
 import depthLimit from 'graphql-depth-limit';
 import { rootQuery } from './rootQuery.js';
+import { ContextValue } from './types/contextValue.js';
 
 const plugin: FastifyPluginAsyncTypebox = async (fastify) => {
   const { prisma } = fastify;
@@ -24,8 +25,8 @@ const plugin: FastifyPluginAsyncTypebox = async (fastify) => {
     },
     async handler(req, reply): Promise<ExecutionResult> {
       const { query, variables } = req.body;
-      console.log('---query---', query);
-      console.log('---variables---', variables);
+      // console.log('---query---', query);
+      // console.log('---variables---', variables);
 
       const validationErrors = validate(schema, parse(query), [depthLimit(5)]);
       if (validationErrors.length > 0) {
@@ -37,7 +38,7 @@ const plugin: FastifyPluginAsyncTypebox = async (fastify) => {
         schema,
         source: query,
         variableValues: variables,
-        contextValue: { prisma },
+        contextValue: { prisma } as ContextValue,
       })
     },
   });
