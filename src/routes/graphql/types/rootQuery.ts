@@ -3,14 +3,14 @@ import {
   GraphQLNonNull,
   GraphQLObjectType,
 } from 'graphql';
-import { ContextValue } from './types/contextValue.js';
-import { MemberTypeId, MemberTypeType } from './types/memberType.js';
-import { PostType } from './types/post.js';
-import { ProfileType } from './types/profile.js';
-import { UUIDType } from './types/uuid.js';
-import { UserType } from './types/user.js';
+import { MemberTypeIdType, MemberTypeType } from './memberType.js';
+import { PostType } from './post.js';
+import { ProfileType } from './profile.js';
+import { UUIDType } from './uuid.js';
+import { UserType } from './user.js';
+import { ContextValue } from '../contextValue.interface.js';
 
-export const rootQuery = new GraphQLObjectType<object, ContextValue>({
+export const rootQueryType = new GraphQLObjectType<object, ContextValue>({
   name: 'Query',
   fields: {
     users: {
@@ -31,7 +31,7 @@ export const rootQuery = new GraphQLObjectType<object, ContextValue>({
     },
     memberType: {
       type: MemberTypeType,
-      args: { id: { type: new GraphQLNonNull(MemberTypeId) } },
+      args: { id: { type: new GraphQLNonNull(MemberTypeIdType) } },
       resolve: async (_root, { id } : { id: string }, { prisma }) =>
         await prisma.memberType.findUnique({ where: { id } }),
     },

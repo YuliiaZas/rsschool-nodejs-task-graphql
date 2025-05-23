@@ -6,11 +6,13 @@ import {
   GraphQLObjectType,
   GraphQLString,
 } from 'graphql';
+import { Static } from '@fastify/type-provider-typebox';
 import { User } from '@prisma/client';
-import { ContextValue } from './contextValue.js';
 import { PostType } from './post.js';
 import { ProfileType } from './profile.js';
 import { UUIDType } from './uuid.js';
+import { ContextValue } from '../contextValue.interface.js';
+import { changeUserByIdSchema, createUserSchema } from '../../users/schemas.js';
 
 export const UserType = new GraphQLObjectType<User, ContextValue>({
   name: 'User',
@@ -51,12 +53,8 @@ export const UserType = new GraphQLObjectType<User, ContextValue>({
   }),
 });
 
-export type CreateUserDto = {
-  name: string,
-  balance: number,
-}
-
-export type ChangeUserDto = Partial<CreateUserDto>;
+export type CreateUserDto = Static<(typeof createUserSchema)['body']>
+export type ChangeUserDto = Static<(typeof changeUserByIdSchema)['body']>
 
 export const CreateUserInputType = new GraphQLInputObjectType({
   name: 'CreateUserInput',

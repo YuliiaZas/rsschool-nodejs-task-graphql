@@ -6,11 +6,13 @@ import {
   GraphQLObjectType,
   GraphQLString,
 } from 'graphql';
+import { Static } from '@fastify/type-provider-typebox';
 import { Profile } from '@prisma/client';
-import { ContextValue } from './contextValue.js';
 import { MemberTypeType } from './memberType.js';
 import { UUIDType } from './uuid.js';
 import { UserType } from './user.js';
+import { ContextValue } from '../contextValue.interface.js';
+import { changeProfileByIdSchema, createProfileSchema } from '../../profiles/schemas.js';
 
 export const ProfileType = new GraphQLObjectType<Profile, ContextValue>({
   name: 'Profile',
@@ -33,15 +35,8 @@ export const ProfileType = new GraphQLObjectType<Profile, ContextValue>({
   }),
 });
 
-export type ChangeProfileDto = {
-  isMale?: boolean,
-  yearOfBirth?: number,
-  memberTypeId?: string,
-}
-
-export type CreateProfileDto = Required<ChangeProfileDto> & {
-  userId: string,
-};
+export type CreateProfileDto = Static<(typeof createProfileSchema)['body']>
+export type ChangeProfileDto = Static<(typeof changeProfileByIdSchema)['body']>
 
 export const CreateProfileInputType = new GraphQLInputObjectType({
   name: 'CreateProfileInput',

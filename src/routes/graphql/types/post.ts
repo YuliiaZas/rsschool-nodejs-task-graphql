@@ -4,10 +4,12 @@ import {
   GraphQLObjectType,
   GraphQLString,
 } from 'graphql';
+import { Static } from '@fastify/type-provider-typebox';
 import { Post } from '@prisma/client';
-import { ContextValue } from './contextValue.js';
 import { UserType } from './user.js';
 import { UUIDType } from './uuid.js';
+import { ContextValue } from '../contextValue.interface.js';
+import { changePostByIdSchema, createPostSchema } from '../../posts/schemas.js';
 
 export const PostType = new GraphQLObjectType<Post, ContextValue>({
   name: 'Post',
@@ -24,14 +26,8 @@ export const PostType = new GraphQLObjectType<Post, ContextValue>({
   }),
 });
 
-export type ChangePostDto = {
-  title?: string,
-  content?: string,
-}
-
-export type CreatePostDto = Required<ChangePostDto> & {
-  authorId: string,
-};
+export type CreatePostDto = Static<(typeof createPostSchema)['body']>
+export type ChangePostDto = Static<(typeof changePostByIdSchema)['body']>
 
 export const CreatePostInputType = new GraphQLInputObjectType({
   name: 'CreatePostInput',

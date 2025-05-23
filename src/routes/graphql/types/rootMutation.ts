@@ -1,29 +1,29 @@
 import { GraphQLNonNull, GraphQLObjectType, GraphQLString } from "graphql";
-import { ContextValue } from "./types/contextValue.js";
 import {
   ChangePostDto,
   ChangePostInputType,
   CreatePostDto,
   CreatePostInputType,
   PostType
-} from "./types/post.js";
+} from "./post.js";
 import {
   ChangeProfileDto,
   ChangeProfileInputType,
   CreateProfileDto,
   CreateProfileInputType,
   ProfileType
-} from "./types/profile.js";
+} from "./profile.js";
 import {
   ChangeUserDto,
   ChangeUserInputType,
   CreateUserDto,
   CreateUserInputType,
   UserType
-} from "./types/user.js";
-import { UUIDType } from "./types/uuid.js";
+} from "./user.js";
+import { UUIDType } from "./uuid.js";
+import { ContextValue } from "../contextValue.interface.js";
 
-export const rootMutation = new GraphQLObjectType<object, ContextValue>({
+export const rootMutationType = new GraphQLObjectType<object, ContextValue>({
   name: 'Mutation',
   fields: {
     createUser: {

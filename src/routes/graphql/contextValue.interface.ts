@@ -1,5 +1,5 @@
 import { PrismaClient } from "@prisma/client";
 
-export type ContextValue = {
+export interface ContextValue {
   prisma: PrismaClient;
 };
