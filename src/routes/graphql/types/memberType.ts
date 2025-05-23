@@ -5,6 +5,7 @@ import {
   GraphQLNonNull,
   GraphQLObjectType,
 } from 'graphql';
+import { MemberType } from '@prisma/client';
 
 export const MemberTypeId = new GraphQLEnumType({
   name: 'MemberTypeId',
@@ -14,7 +15,7 @@ export const MemberTypeId = new GraphQLEnumType({
   },
 });
 
-export const MemberTypeType = new GraphQLObjectType({
+export const MemberTypeType = new GraphQLObjectType<MemberType>({
   name: 'MemberType',
   fields: {
     id: { type: new GraphQLNonNull(MemberTypeId) },

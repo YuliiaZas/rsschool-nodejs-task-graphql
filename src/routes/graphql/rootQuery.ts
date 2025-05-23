@@ -52,7 +52,7 @@ export const rootQuery = new GraphQLObjectType({
         await prisma.profile.findMany(),
     },
     profile: {
-      type: ProfileType,
+      type: ProfileType as GraphQLObjectType,
       args: { id: { type: new GraphQLNonNull(UUIDType) } },
       resolve: async (_root, { id } : { id: string }, { prisma }: ContextValue) =>
         await prisma.profile.findUnique({ where: { id } }),
