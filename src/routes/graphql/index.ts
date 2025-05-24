@@ -11,6 +11,7 @@ import depthLimit from 'graphql-depth-limit';
 import { ContextValue } from './contextValue.interface.js';
 import { rootMutationType } from './types/rootMutation.js';
 import { rootQueryType } from './types/rootQuery.js';
+import { createLoaders } from './loaders.js';
 
 const plugin: FastifyPluginAsyncTypebox = async (fastify) => {
   const { prisma } = fastify;
@@ -35,11 +36,16 @@ const plugin: FastifyPluginAsyncTypebox = async (fastify) => {
       }
       console.log("validationErrors: ", validationErrors);
 
+      const contextValue: ContextValue = {
+        prisma,
+        loaders: createLoaders(prisma),
+      }
+
       return await graphql({
         schema,
         source: query,
         variableValues: variables,
-        contextValue: { prisma } as ContextValue,
+        contextValue,
       })
     },
   });

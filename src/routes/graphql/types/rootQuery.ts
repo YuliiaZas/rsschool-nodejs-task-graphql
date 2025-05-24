@@ -41,7 +41,7 @@ export const rootQueryType = new GraphQLObjectType<object, ContextValue>({
         await prisma.post.findMany(),
     },
     post: {
-      type: PostType,
+      type: PostType as GraphQLObjectType,
       args: { id: { type: new GraphQLNonNull(UUIDType) } },
       resolve: async (_root, { id } : { id: string }, { prisma }) =>
         await prisma.post.findUnique({ where: { id } }),

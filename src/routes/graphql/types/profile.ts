@@ -22,9 +22,10 @@ export const ProfileType = new GraphQLObjectType<Profile, ContextValue>({
     yearOfBirth: { type: new GraphQLNonNull(GraphQLInt) },
     memberTypeId: { type: new GraphQLNonNull(UUIDType) },
     memberType: {
-      type: new GraphQLNonNull(MemberTypeType),
-      resolve: async (profile, _args, { prisma }) =>
-        await prisma.memberType.findUnique({ where: { id: profile.memberTypeId } }),
+      type: MemberTypeType,
+      resolve: async (profile, _args, { loaders }) =>
+        (await loaders.memberType.load(profile.memberTypeId))?.[0] ,
+        // await prisma.memberType.findUnique({ where: { id: profile.memberTypeId } }),
     },
     userId: { type: new GraphQLNonNull(UUIDType) },
     user: {

@@ -22,32 +22,36 @@ export const UserType = new GraphQLObjectType<User, ContextValue>({
     balance: { type: new GraphQLNonNull(GraphQLFloat) },
     profile: { 
       type: ProfileType as GraphQLObjectType,
-      resolve: async (user, _args, { prisma }) =>
-        await prisma.profile.findUnique({ where: { userId: user.id } }),
+      resolve: async (user, _args, { loaders }) =>
+        await loaders.profile.load(user.id),
+        // await prisma.profile.findUnique({ where: { userId: user.id } }),
     },
     posts: { 
       type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(PostType))),
-      resolve: async (user, _args, { prisma }) =>
-        await prisma.post.findMany({ where: { authorId: user.id } }),
+      resolve: async (user, _args, { loaders }) =>
+        await loaders.post.load(user.id),
+        // await prisma.post.findMany({ where: { authorId: user.id } }),
     },
     userSubscribedTo: {
       type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(UserType))),
-      resolve: async (user, _args, { prisma }) => {
-        const subscribers = await prisma.subscribersOnAuthors.findMany({
-          where: { subscriberId: user.id },
-          include: { author: true },
-        });
-        return subscribers.map((subscriber) => subscriber.author);
+      resolve: async (user, _args, { loaders }) => {
+        return await loaders.userSubscribedTo.load(user.id);
+        // const subscribers = await prisma.subscribersOnAuthors.findMany({
+        //   where: { subscriberId: user.id },
+        //   include: { author: true },
+        // });
+        // return subscribers.map((subscriber) => subscriber.author);
       },
     },
     subscribedToUser: {
       type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(UserType))),
-      resolve: async (user, _args, { prisma }) => {
-        const subscribers = await prisma.subscribersOnAuthors.findMany({
-          where: { authorId: user.id },
-          include: { subscriber: true },
-        });
-        return subscribers.map((subscriber) => subscriber.subscriber);
+      resolve: async (user, _args, { loaders }) => {
+        return await loaders.subscribedToUser.load(user.id);
+        // const subscribers = await prisma.subscribersOnAuthors.findMany({
+        //   where: { authorId: user.id },
+        //   include: { subscriber: true },
+        // });
+        // return subscribers.map((subscriber) => subscriber.subscriber);
       },
     },
   }),
