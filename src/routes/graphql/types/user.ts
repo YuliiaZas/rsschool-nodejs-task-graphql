@@ -35,6 +35,9 @@ export const UserType = new GraphQLObjectType<User, ContextValue>({
     userSubscribedTo: {
       type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(UserType))),
       resolve: async (user, _args, { loaders }) => {
+        if ('userSubscribedTo' in user && user.userSubscribedTo) {
+          return user.userSubscribedTo;
+        }
         return await loaders.userSubscribedTo.load(user.id);
         // const subscribers = await prisma.subscribersOnAuthors.findMany({
         //   where: { subscriberId: user.id },
@@ -46,6 +49,9 @@ export const UserType = new GraphQLObjectType<User, ContextValue>({
     subscribedToUser: {
       type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(UserType))),
       resolve: async (user, _args, { loaders }) => {
+        if ('subscribedToUser' in user && user.subscribedToUser) {
+          return user.subscribedToUser;
+        }
         return await loaders.subscribedToUser.load(user.id);
         // const subscribers = await prisma.subscribersOnAuthors.findMany({
         //   where: { authorId: user.id },

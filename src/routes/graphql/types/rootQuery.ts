@@ -3,6 +3,11 @@ import {
   GraphQLNonNull,
   GraphQLObjectType,
 } from 'graphql';
+import {
+  parseResolveInfo,
+  ResolveTree,
+  simplifyParsedResolveInfoFragmentWithType
+} from 'graphql-parse-resolve-info';
 import { MemberTypeIdType, MemberTypeType } from './memberType.js';
 import { PostType } from './post.js';
 import { ProfileType } from './profile.js';
@@ -15,8 +20,37 @@ export const rootQueryType = new GraphQLObjectType<object, ContextValue>({
   fields: {
     users: {
       type: new GraphQLList(UserType),
-      resolve: async (_root, _args, { prisma }) =>
-        await prisma.user.findMany(),
+      // resolve: async (_root, _args, { prisma }) =>
+      //   await prisma.user.findMany(),
+      resolve: async (_root, _args, { prisma }, info) => {
+        const parsedResolveInfoFragment = parseResolveInfo(info);
+        if (!parsedResolveInfoFragment) {
+          throw new Error('Could not parse resolve info');
+        }
+        const simplifiedFragment = simplifyParsedResolveInfoFragmentWithType(
+          parsedResolveInfoFragment as ResolveTree, info.returnType
+        );
+
+        const includeUserSubscribedTo = Boolean(simplifiedFragment.fieldsByTypeName.User?.userSubscribedTo);
+        const includeSubscribedToUser = Boolean(simplifiedFragment.fieldsByTypeName.User?.subscribedToUser);
+
+        const users = await prisma.user.findMany({
+          include: {
+            ...(includeUserSubscribedTo && {userSubscribedTo: includeUserSubscribedTo}),
+            ...(includeSubscribedToUser && {subscribedToUser: includeSubscribedToUser})
+          }
+        });
+
+        return users.map(user => ({
+          ...user,
+          userSubscribedTo: includeUserSubscribedTo
+            ? user.userSubscribedTo.map(rel => users.find(u => u.id === rel.authorId)).filter(Boolean)
+            : undefined,
+          subscribedToUser: includeSubscribedToUser
+            ? user.subscribedToUser.map(rel => users.find(u => u.id === rel.subscriberId)).filter(Boolean)
+            : undefined,
+        }));
+      },
     },
     user: {
       type: UserType as GraphQLObjectType,
