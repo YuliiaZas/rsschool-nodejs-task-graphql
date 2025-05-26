@@ -27,14 +27,11 @@ const plugin: FastifyPluginAsyncTypebox = async (fastify) => {
     },
     async handler(req, reply): Promise<ExecutionResult> {
       const { query, variables } = req.body;
-      // console.log('---query---', query);
-      // console.log('---variables---', variables);
 
       const validationErrors = validate(schema, parse(query), [depthLimit(5)]);
       if (validationErrors.length > 0) {
         return reply.status(400).send({ errors: validationErrors });
       }
-      console.log("validationErrors: ", validationErrors);
 
       const contextValue: ContextValue = {
         prisma,
