@@ -1,7 +1,8 @@
 import { MemberType, Post, PrismaClient, Profile, User } from "@prisma/client";
 import DataLoader from "dataloader";
+import { ContextValue } from "./contextValue.interface.js";
 
-export function createLoaders(prisma: PrismaClient) {
+export function createLoaders(prisma: PrismaClient): ContextValue['loaders'] {
   return {
     userSubscribedTo: new DataLoader<string, User[]>(
       ids => genUserSubscribedTo(prisma, ids),
@@ -98,7 +99,7 @@ const getCorrespondedArrays = <T, R = T>(
   rows: R[],
   keyFn: (row: R) => string = row => (row as {id: string}).id,
   valueFn: (row: R) => T = row => row as unknown as T
-) => {
+): T[][] => {
   const map = new Map<string, T[]>();
   for (const id of ids) map.set(id, []);
   for (const row of rows) {
